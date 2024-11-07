@@ -25,20 +25,20 @@ module device_registers
     // Crossing from SPI clock to Global clock
     // Use 2FF synchronizer to cross domains
     // !! Compare synthesis with shift register HDL !!
-    reg wr_req_ff0       = 1'b0;
-    reg wr_req_ff1       = 1'b0;
-    reg wr_req_ff2       = 1'b0;
-    reg rd_req_ff0       = 1'b0;
-    reg rd_req_ff1       = 1'b0;
-    reg rd_req_ff2       = 1'b0;
+    reg wr_req_ff0      = 1'b0;
+    reg wr_req_ff1      = 1'b0;
+    reg wr_req_ff2      = 1'b0;
+    reg rd_req_ff0      = 1'b0;
+    reg rd_req_ff1      = 1'b0;
+    reg rd_req_ff2      = 1'b0;
     
     // device registers interface signals
-    reg       wr_en_r    = 1'b0;
-    reg       rd_en_r    = 1'b0;
-    reg [6:0] wr_addr_r  = 7'b0;
-    reg [6:0] rd_addr_r  = 7'b0;
-    reg [7:0] wr_data_r  = 8'b0;
-    reg [7:0] rd_data_r  = 8'b0;
+    reg       wr_en_r   = 1'b0;
+    reg       rd_en_r   = 1'b0;
+    reg [6:0] wr_addr_r = 7'b0;
+    reg [6:0] rd_addr_r = 7'b0;
+    reg [7:0] wr_data_r = 8'b0;
+    reg [7:0] rd_data_r = 8'b0;
     
     // internal debug registers
     reg  [7:0] reg_extled0_dcycl_r = 8'd10;  // Hz
