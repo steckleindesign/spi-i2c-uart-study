@@ -1,10 +1,5 @@
 `timescale 1ns / 1ps
 
-// Reads look ok, need to be careful with writes,
-// When data byte is sent, if CS goes high too soon,
-// then the data byte might not get to the device register module
-// Consider a null byte at the end of a write for now
-
 module spi_interface(
     // SPI interface
     input  wire       SCK,
@@ -27,7 +22,7 @@ module spi_interface(
     reg        hold_rd_data_r = 1'b0;
     
     // Data-In/Out shift register
-    // DIN SR is of pingpong fashion, 2 8-bits shift registers
+    // DIN SR is of pingpong fashion, 2 8-bit shift registers
     reg  [7:0] din_sr[1:0];
     reg  [7:0] dout_sr        = 8'b0;
     
@@ -44,7 +39,7 @@ module spi_interface(
     reg        cmd_byte_r     = 1'b1; // Determines read/write and register address
     reg        null_byte_r    = 1'b0; // 0's
     reg        data_byte_r    = 1'b0; // Write data byte
-    reg        rd_byte_r      = 1'b0;
+    reg        rd_byte_r      = 1'b0; // Read data sent out to MCU
     
     // Side of the pingpong shift register which is being written by MCU
     reg        pp_side_r      = 1'b0;
@@ -73,7 +68,7 @@ module spi_interface(
     end
     
     // CS acts as asynchronous reset
-    // Need to study implementation closely
+    // Need to study synthesis/implementation closely
     always @ (posedge SCK or posedge CS)
     begin
         if (CS == 1'b1)
@@ -83,7 +78,7 @@ module spi_interface(
             rd_req_r    <= 1'b0;
             din_sr[0]   <= 8'b0;
             din_sr[1]   <= 8'b0;
-            cmd_byte_r  <= 1'b1; // First cycle after reset is command byte
+            cmd_byte_r  <= 1'b1;
             null_byte_r <= 1'b0;
             data_byte_r <= 1'b0;
             rd_byte_r   <= 1'b0;
@@ -92,6 +87,7 @@ module spi_interface(
         begin
             // Each cycle process COPI bit
             din_sr[pp_side_r] <= { din_sr[pp_side_r][6:0], COPI };
+            
             // First bit of byte transfer
             case (curr_bit_r)
                 3'd7:
@@ -100,6 +96,7 @@ module spi_interface(
                     // so we can always register both read and write addresses
                     wr_addr_r      <= din_sr[~pp_side_r][6:0];
                     rd_addr_r      <= din_sr[~pp_side_r][6:0];
+                    
                     // Drive read request signal high right away in a null byte
                     // In this design, null byte only occurs when a read is to occur
                     rd_req_r       <= null_byte_r;
@@ -111,6 +108,7 @@ module spi_interface(
                 begin
                     // hold read data strobe only needs to last 1 SPI clk cycle
                     hold_rd_data_r <= 1'b0;
+                    
                     // Default byte states to 0, override if necessary
                     cmd_byte_r     <= 1'b0;
                     null_byte_r    <= 1'b0;
