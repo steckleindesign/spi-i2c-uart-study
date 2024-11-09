@@ -51,7 +51,7 @@ module device_registers
     begin
         // Generate write enable
         wr_en_r <= 1'b0;
-        if (wr_req_ff2 == 1'b1 && wr_req_ff1 == 1'b0)
+        if (wr_req_ff2 & ~wr_req_ff1)
         begin
             wr_addr_r <= WR_ADDR;
             wr_data_r <= WR_DATA;
@@ -63,7 +63,7 @@ module device_registers
         
         // Generate read enable
         rd_en_r <= 1'b0;
-        if (rd_req_ff2 == 1'b1 && rd_req_ff1 == 1'b0)
+        if (rd_req_ff2 & ~rd_req_ff1)
         begin
             rd_addr_r <= RD_ADDR;
             rd_en_r   <= 1'b1;
@@ -101,7 +101,7 @@ module device_registers
         end
     end
     // Read data connected to internal read data register
-    assign RD_DATA     = rd_data_r;
+    assign RD_DATA = rd_data_r;
     
     // Debug registers output to other modules
     assign REG_EXTLED0_DCYCL = reg_extled0_dcycl_r;

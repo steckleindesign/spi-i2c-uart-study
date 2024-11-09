@@ -15,7 +15,12 @@ module serial_top(
     input  wire TEST, // MCU timer output
     output reg  LED0_R,
     output reg  LED0_G,
-    output reg  LED0_B
+    output reg  LED0_B,
+    // Debugging SPI interface
+    output wire [7:0] DEBUG_REG_EXTLED0_DCYCL,
+    output wire [7:0] DEBUG_REG_EXTLED0_DCYCH,
+    output wire [7:0] DEBUG_REG_EXTLED1_DCYCL,
+    output wire [7:0] DEBUG_REG_EXTLED1_DCYCH
 );
 
     wire       wr_req_w;
@@ -32,15 +37,15 @@ module serial_top(
     wire [7:0] reg_extled1_dcych_w;
     
     spi_interface    spi0 (.SCK(SCK),
-                          .CS(CS),
-                          .COPI(COPI),
-                          .CIPO(CIPO),
-                          .WR_REQ(wr_req_w),
-                          .RD_REQ(rd_req_w),
-                          .WR_ADDR(wr_addr_w),
-                          .RD_ADDR(rd_addr_w),
-                          .WR_DATA(wr_data_w),
-                          .RD_DATA(rd_data_w));
+                           .CS(CS),
+                           .COPI(COPI),
+                           .CIPO(CIPO),
+                           .WR_REQ(wr_req_w),
+                           .RD_REQ(rd_req_w),
+                           .WR_ADDR(wr_addr_w),
+                           .RD_ADDR(rd_addr_w),
+                           .WR_DATA(wr_data_w),
+                           .RD_DATA(rd_data_w));
                         
     device_registers reg0 (.CLK(CLK),
                            .WR_REQ(wr_req_w),
@@ -71,5 +76,10 @@ module serial_top(
         LED0_R <= 1'b0;
         LED0_G <= ~TEST;
     end
+    
+    assign DEBUG_REG_EXTLED0_DCYCL = reg_extled0_dcycl_w;
+    assign DEBUG_REG_EXTLED0_DCYCH = reg_extled0_dcych_w;
+    assign DEBUG_REG_EXTLED1_DCYCL = reg_extled1_dcycl_w;
+    assign DEBUG_REG_EXTLED1_DCYCH = reg_extled1_dcych_w;
 
 endmodule
