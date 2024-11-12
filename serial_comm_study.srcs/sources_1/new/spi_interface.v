@@ -12,9 +12,7 @@ module spi_interface(
     output wire [6:0] WR_ADDR,
     output wire [6:0] RD_ADDR,
     output wire [7:0] WR_DATA,
-    input  wire [7:0] RD_DATA,
-    
-    output wire       pingpong
+    input  wire [7:0] RD_DATA
 );
         
     // curr bit in transaction, MSB first
@@ -147,7 +145,5 @@ module spi_interface(
             curr_bit_r <= curr_bit_r - 1'b1;
         end
     end
-    
-    assign pingpong = pp_side_r;
 
 endmodule
