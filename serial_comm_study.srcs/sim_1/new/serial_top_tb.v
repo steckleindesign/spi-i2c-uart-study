@@ -21,6 +21,11 @@ module serial_top_tb();
     wire [7:0] DEBUG_REG_EXTLED1_DCYCL;
     wire [7:0] DEBUG_REG_EXTLED1_DCYCH;
     
+    wire       debug_pingpong;
+    wire       debug_wr_req;
+    wire [6:0] debug_wr_addr;
+    wire [7:0] debug_wr_data;
+    
     serial_top UUT (.CLK(CLK),
                     .SCK(SCK),
                     .CS(CS),
@@ -35,7 +40,11 @@ module serial_top_tb();
                     .DEBUG_REG_EXTLED0_DCYCL(DEBUG_REG_EXTLED0_DCYCL),
                     .DEBUG_REG_EXTLED0_DCYCH(DEBUG_REG_EXTLED0_DCYCH),
                     .DEBUG_REG_EXTLED1_DCYCL(DEBUG_REG_EXTLED1_DCYCL),
-                    .DEBUG_REG_EXTLED1_DCYCH(DEBUG_REG_EXTLED1_DCYCH));
+                    .DEBUG_REG_EXTLED1_DCYCH(DEBUG_REG_EXTLED1_DCYCH),
+                    .debug_pingpong(debug_pingpong),
+                    .debug_wr_req(debug_wr_req),
+                    .debug_wr_addr(debug_wr_addr),
+                    .debug_wr_data(debug_wr_data));
                     
     always
     begin
@@ -133,11 +142,11 @@ module serial_top_tb();
         #10;
         SCK  = 1'b0;
         COPI = 1'b1;
-        #10;
-        SCK  = 1'b1;
-        #10;
-        SCK  = 1'b0;
-        COPI = 1'b1;
+//        #10;
+//        SCK  = 1'b1;
+//        #10;
+//        SCK  = 1'b0;
+//        COPI = 1'b1;
         #10;
         SCK  = 1'b1;
         #20

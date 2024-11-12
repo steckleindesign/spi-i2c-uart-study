@@ -20,7 +20,12 @@ module serial_top(
     output wire [7:0] DEBUG_REG_EXTLED0_DCYCL,
     output wire [7:0] DEBUG_REG_EXTLED0_DCYCH,
     output wire [7:0] DEBUG_REG_EXTLED1_DCYCL,
-    output wire [7:0] DEBUG_REG_EXTLED1_DCYCH
+    output wire [7:0] DEBUG_REG_EXTLED1_DCYCH,
+    
+    output wire       debug_pingpong,
+    output wire       debug_wr_req,
+    output wire [6:0] debug_wr_addr,
+    output wire [7:0] debug_wr_data
 );
 
     wire       wr_req_w;
@@ -45,7 +50,8 @@ module serial_top(
                            .WR_ADDR(wr_addr_w),
                            .RD_ADDR(rd_addr_w),
                            .WR_DATA(wr_data_w),
-                           .RD_DATA(rd_data_w));
+                           .RD_DATA(rd_data_w),
+                           .pingpong(debug_pingpong));
                         
     device_registers reg0 (.CLK(CLK),
                            .WR_REQ(wr_req_w),
@@ -81,5 +87,9 @@ module serial_top(
     assign DEBUG_REG_EXTLED0_DCYCH = reg_extled0_dcych_w;
     assign DEBUG_REG_EXTLED1_DCYCL = reg_extled1_dcycl_w;
     assign DEBUG_REG_EXTLED1_DCYCH = reg_extled1_dcych_w;
+    
+    assign debug_wr_req  = wr_req_w;
+    assign debug_wr_addr = wr_addr_w;
+    assign debug_wr_data = wr_data_w;
 
 endmodule

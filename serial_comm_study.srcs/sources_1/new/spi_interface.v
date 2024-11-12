@@ -12,7 +12,9 @@ module spi_interface(
     output wire [6:0] WR_ADDR,
     output wire [6:0] RD_ADDR,
     output wire [7:0] WR_DATA,
-    input  wire [7:0] RD_DATA
+    input  wire [7:0] RD_DATA,
+    
+    output wire       pingpong
 );
         
     // curr bit in transaction, MSB first
@@ -25,6 +27,8 @@ module spi_interface(
     // DIN SR is of pingpong fashion, 2 8-bit shift registers
     reg  [7:0] din_sr[1:0];
     reg  [7:0] dout_sr        = 8'b0;
+    
+    reg  [7:0] data_in_gated  = 8'b0;
     
     // Addresses of device registers
     // R/W separate so we can implement full duplex later
@@ -53,7 +57,7 @@ module spi_interface(
     assign RD_ADDR = rd_addr_r;
     
     // Write data byte sent to device register module
-    assign WR_DATA = din_sr[pp_side_r];
+    assign WR_DATA = data_in_gated; // din_sr[pp_side_r];
     
     // Shift out data on CIPO via 8-bit wide SR
     assign CIPO    = dout_sr[7];
@@ -73,9 +77,10 @@ module spi_interface(
     begin
         if (CS == 1'b1)
         begin
-            curr_bit_r  <= 3'b111;
+            curr_bit_r  <= 3'd7;
             wr_req_r    <= 1'b0;
             rd_req_r    <= 1'b0;
+            pp_side_r   <= 1'b0;
             din_sr[0]   <= 8'b0;
             din_sr[1]   <= 8'b0;
             cmd_byte_r  <= 1'b1;
@@ -85,6 +90,10 @@ module spi_interface(
         end
         else
         begin
+            // We hold the input data in a register
+            // so it can be used after CS goes high
+            // Study synthesis/implementation to make sure there isn't duplicate logic
+            data_in_gated <= CS ? data_in_gated : { din_sr[pp_side_r][6:0], COPI };
             // Each cycle process COPI bit
             din_sr[pp_side_r] <= { din_sr[pp_side_r][6:0], COPI };
             
@@ -116,7 +125,10 @@ module spi_interface(
                     rd_byte_r      <= 1'b0;
                     
                     // After command byte, flip pp write side
-                    pp_side_r      <= cmd_byte_r ? pp_side_r : ~pp_side_r;
+                    // pp_side_r      <= cmd_byte_r ? pp_side_r : ~pp_side_r;
+                    
+                    // Flip pp write side each byte
+                    pp_side_r      <= ~pp_side_r;
                     
                     // During last bit of command byte
                     // Check Read/Write bit to determine next byte state
@@ -135,5 +147,7 @@ module spi_interface(
             curr_bit_r <= curr_bit_r - 1'b1;
         end
     end
+    
+    assign pingpong = pp_side_r;
 
 endmodule
