@@ -19,6 +19,11 @@ module serial_top_tb();
     wire [7:0] DEBUG_REG_EXTLED1_DCYCL;
     wire [7:0] DEBUG_REG_EXTLED1_DCYCH;
     
+    // Data for test
+    reg  [7:0] addr;
+    reg  [7:0] data;
+    
+    
     serial_top UUT (.CLK(CLK),
                     .SCK(SCK),
                     .CS(CS),
@@ -36,104 +41,43 @@ module serial_top_tb();
                     
     always
     begin
-        CLK = 1'b0;
-        #4;
-        CLK = 1'b1;
-        #4;
+        #4 CLK = ~CLK;
     end
     
     initial
     begin
+        CLK  = 1'b0;
         SCK  = 1'b1;
         CS   = 1'b1;
         COPI = 1'b0;
-        #10;
-        CS   = 1'b0;
-        #20;
-        SCK  = 1'b0;
-        COPI = 1'b0;
-        #10;
-        SCK  = 1'b1;
-        #10;
-        SCK  = 1'b0;
-        COPI = 1'b0;
-        #10;
-        SCK  = 1'b1;
-        #10;
-        SCK  = 1'b0;
-        COPI = 1'b0;
-        #10;
-        SCK  = 1'b1;
-        #10;
-        SCK  = 1'b0;
-        COPI = 1'b0;
-        #10;
-        SCK  = 1'b1;
-        #10;
-        SCK  = 1'b0;
-        COPI = 1'b0;
-        #10;
-        SCK  = 1'b1;
-        #10;
-        SCK  = 1'b0;
-        COPI = 1'b0;
-        #10;
-        SCK  = 1'b1;
-        #10;
-        SCK  = 1'b0;
-        COPI = 1'b1;
-        #10;
-        SCK  = 1'b1;
-        #10;
-        SCK  = 1'b0;
-        COPI = 1'b1;
-        #10;
-        SCK  = 1'b1;
-        #10;
-        SCK  = 1'b0;
-        COPI = 1'b0;
-        #10;
-        SCK  = 1'b1;
-        #10;
-        SCK  = 1'b0;
-        COPI = 1'b1;
-        #10;
-        SCK  = 1'b1;
-        #10;
-        SCK  = 1'b0;
-        COPI = 1'b0;
-        #10;
-        SCK  = 1'b1;
-        #10;
-        SCK  = 1'b0;
-        COPI = 1'b1;
-        #10;
-        SCK  = 1'b1;
-        #10;
-        SCK  = 1'b0;
-        COPI = 1'b0;
-        #10;
-        SCK  = 1'b1;
-        #10;
-        SCK  = 1'b0;
-        COPI = 1'b1;
-        #10;
-        SCK  = 1'b1;
-        #10;
-        SCK  = 1'b0;
-        COPI = 1'b0;
-        #10;
-        SCK  = 1'b1;
-        #10;
-        SCK  = 1'b0;
-        COPI = 1'b1;
-        #10;
-        SCK  = 1'b1;
-        #10
-        COPI = 1'b0;
-        #10
-        CS   = 1'b1;
+        addr = 8'h00;
+        data = 8'h00;
+        #100;
+        addr = 8'h03;
+        data = 8'h78;
+        transfer_byte(addr);
+        transfer_byte(data);
         #100;
     end
+    
+    task transfer_byte(input [7:0] byte);
+        integer i;
+        begin
+            CS  = 1'b0;
+            #20
+            SCK = 1'b0;
+            for (i = 7; i >= 0; i = i - 1)
+            begin
+                SCK  = 1'b0;
+                COPI = byte[i];
+                #10;
+                SCK  = 1'b1;
+                #10;
+            end
+            SCK = 1'b1;
+            #10
+            CS  = 1'b1;
+        end
+    endtask
     
 endmodule
