@@ -23,7 +23,6 @@ module serial_top_tb();
     reg  [7:0] addr;
     reg  [7:0] data;
     
-    
     serial_top UUT (.CLK(CLK),
                     .SCK(SCK),
                     .CS(CS),
@@ -52,12 +51,18 @@ module serial_top_tb();
         COPI = 1'b0;
         addr = 8'h00;
         data = 8'h00;
-        #100;
+        #50;
         addr = 8'h03;
         data = 8'h78;
         transfer_byte(addr);
         transfer_byte(data);
         #100;
+        addr = 8'h70 | 8'h80; // 0x80 sets bit 7 to 1, for a read operation
+        data = 8'h0;
+        transfer_byte(addr); // Command byte
+        transfer_byte(data); // Null byte, send 0's, receive 0's
+        transfer_byte(data); // Read byte, send 0's, receive read data
+        #50;
     end
     
     task transfer_byte(input [7:0] byte);

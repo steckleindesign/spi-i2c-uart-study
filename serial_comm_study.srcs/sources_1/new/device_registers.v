@@ -1,12 +1,6 @@
 `timescale 1ns / 1ps
 
-module device_registers
-#(
-    parameter [6:0] REG_EXTLED0_DCYCL_ADDR = 7'h03,
-    parameter [6:0] REG_EXTLED0_DCYCH_ADDR = 7'h1C,
-    parameter [6:0] REG_EXTLED1_DCYCL_ADDR = 7'h70,
-    parameter [6:0] REG_EXTLED1_DCYCH_ADDR = 7'h79
-)(
+module device_registers(
     // Device register block interface
     input  wire       CLK,
     input  wire       WR_REQ,
@@ -21,6 +15,11 @@ module device_registers
     output wire [7:0] REG_EXTLED1_DCYCL,
     output wire [7:0] REG_EXTLED1_DCYCH
 );
+
+    localparam [6:0] REG_EXTLED0_DCYCL_ADDR = 7'h03;
+    localparam [6:0] REG_EXTLED0_DCYCH_ADDR = 7'h1C;
+    localparam [6:0] REG_EXTLED1_DCYCL_ADDR = 7'h70;
+    localparam [6:0] REG_EXTLED1_DCYCH_ADDR = 7'h79;
 
     // Crossing from SPI clock to Global clock
     // Use 2FF synchronizer to cross domains
