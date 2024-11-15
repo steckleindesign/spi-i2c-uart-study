@@ -87,9 +87,10 @@ module device_registers(
     end
     
     // Register reads
+    // Be careful about read enable width, and resetting rd_data_r register value
     always @ (posedge CLK)
     begin
-        if (rd_en_r == 1'b1)
+        if (rd_en_r)
         begin
             case (rd_addr_r)
                 REG_EXTLED0_DCYCL_ADDR : rd_data_r <= reg_extled0_dcycl_r;

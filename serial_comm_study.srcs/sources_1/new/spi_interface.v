@@ -66,7 +66,7 @@ module spi_interface(
         // Need to hold incoming data from device registers module
         // Drive CIPO line via data-out shift register
         // CIPO idles low outside of a read cycle
-        dout_sr <= hold_rd_data_r ? RD_DATA : rd_byte_r ? { dout_sr[6:0], 1'b0 } : 8'b0;                              
+        dout_sr <= hold_rd_data_r ? RD_DATA : rd_byte_r ? { dout_sr[6:0], 1'b0 } : 8'b0;
     end
     
     // CS acts as asynchronous reset
@@ -108,6 +108,8 @@ module spi_interface(
                     // In this design, null byte only occurs when a read is to occur
                     rd_req_r       <= null_byte_r;
                 end
+                3'd4:
+                    rd_req_r       <= 1'b0;
                 3'd1:
                     hold_rd_data_r <= null_byte_r;
                 // Logic during last bit of each byte transfer
